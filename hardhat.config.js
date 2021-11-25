@@ -10,11 +10,10 @@ module.exports = {
   solidity: "0.8.9",
   networks: {
     polygon: {
-      url:
-        "https://polygon-mainnet.infura.io/v3/" + process.env.INFURAPROJECTID,
+      url: "https://polygon-rpc.com/",
     },
     mumbai: {
-      url: "https://polygon-mumbai.infura.io/v3/" + process.env.INFURAPROJECTID,
+      url: "https://rpc-mumbai.maticvigil.com/",
       accounts: { mnemonic: process.env.DEVMNEMONIC },
     },
     hardhat: {
