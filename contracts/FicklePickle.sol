@@ -15,16 +15,26 @@ contract FicklePickle is ERC721, ERC721Enumerable, Ownable, ERC721URIStorage {
 
     Counters.Counter private _tokenIdCounter;
 
-    constructor() ERC721("Fickle Pickle", "PICKLE") { }
+    // Mapping from address and tokenID to the amount of time that token was held by that address
+    mapping(address => mapping(uint256 => uint256)) tokenTime;
+
+    // Mapping from a tokenID to when that token was last stolen
+    mapping(uint256 => uint256) blockStolen;
+
+    constructor() ERC721("Fickle Pickle", "PICKLE") {}
 
     function steal(uint256 tokenId) public {
+        // Steal the token
         address from = ownerOf(tokenId);
         address to = msg.sender;
         _transfer(from, to, tokenId);
-    }
 
-    function _baseURI() internal pure override returns (string memory) {
-        return "ipfs://";
+        // Update the tokenTime
+        uint256 timeGained = block.number - blockStolen[tokenId];
+        tokenTime[from][tokenId] += timeGained;
+
+        // Set the block it was stolen
+        blockStolen[tokenId] = block.number;
     }
 
     function safeMint(address to, string memory uri) public onlyOwner {
@@ -36,9 +46,14 @@ contract FicklePickle is ERC721, ERC721Enumerable, Ownable, ERC721URIStorage {
         _safeMint(to, tokenId);
         _setTokenURI(tokenId, uri);
         console.log("Pickle %s minted to", tokenId, to);
+
+        // Set blockStolen to when it was minted
+        blockStolen[tokenId] = block.number;
     }
 
-    // The following functions are overrides required by Solidity.
+    function _baseURI() internal pure override returns (string memory) {
+        return "ipfs://";
+    }
 
     function tokenURI(uint256 tokenId)
         public
@@ -53,7 +68,10 @@ contract FicklePickle is ERC721, ERC721Enumerable, Ownable, ERC721URIStorage {
         return super.tokenURI(tokenId);
     }
 
-    function _burn(uint256 tokenId) internal override(ERC721, ERC721URIStorage) {
+    function _burn(uint256 tokenId)
+        internal
+        override(ERC721, ERC721URIStorage)
+    {
         super._burn(tokenId);
     }
 
