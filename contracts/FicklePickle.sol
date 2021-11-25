@@ -7,18 +7,15 @@ import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
+import "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol";
 
 /// @custom:security-contact wakeup2early@gmail.com
-contract FicklePickle is ERC721, ERC721Enumerable, Ownable {
+contract FicklePickle is ERC721, ERC721Enumerable, Ownable, ERC721URIStorage {
     using Counters for Counters.Counter;
 
     Counters.Counter private _tokenIdCounter;
 
-    uint256 maxPickles;
-
-    constructor() ERC721("Fickle Pickle", "PICKLE") {
-        maxPickles = 100;
-    }
+    constructor() ERC721("Fickle Pickle", "PICKLE") { }
 
     function steal(uint256 tokenId) public {
         address from = ownerOf(tokenId);
@@ -27,36 +24,38 @@ contract FicklePickle is ERC721, ERC721Enumerable, Ownable {
     }
 
     function _baseURI() internal pure override returns (string memory) {
-        return "ipfs://QmRWYhDanWcmYJFqWCbtRemcYzrNYkhVsPCr6Zie7k7s7f";
+        return "ipfs://";
     }
 
-    function safeMint(address to) public onlyOwner {
-        require(
-            _tokenIdCounter.current() < maxPickles,
-            "That's too many pickles!"
-        );
+    function safeMint(address to, string memory uri) public onlyOwner {
+        // Get current ID and increment counter
         uint256 tokenId = _tokenIdCounter.current();
         _tokenIdCounter.increment();
+
+        // Mint the token
         _safeMint(to, tokenId);
+        _setTokenURI(tokenId, uri);
         console.log("Pickle %s minted to", tokenId, to);
     }
+
+    // The following functions are overrides required by Solidity.
 
     function tokenURI(uint256 tokenId)
         public
         view
-        virtual
-        override
+        override(ERC721, ERC721URIStorage)
         returns (string memory)
     {
         require(
             _exists(tokenId),
             "ERC721Metadata: URI query for nonexistent token"
         );
-
-        return _baseURI();
+        return super.tokenURI(tokenId);
     }
 
-    // The following functions are overrides required by Solidity.
+    function _burn(uint256 tokenId) internal override(ERC721, ERC721URIStorage) {
+        super._burn(tokenId);
+    }
 
     function _beforeTokenTransfer(
         address from,
