@@ -1,0 +1,13 @@
+{
+	"description": "These pickles don't feel much attachment to any one address. They can be convinced to move at any time.",
+	"external_url": "https://github.com/up2early/FicklePickle",
+	"image": "ipfs://QmWfZfT3qWbzS1yJvEEorGJE1UQJnPEWpZKRV8E8CjaeNh",
+	"name": "Fickle Luffy",
+	"attributes": [
+		{
+			"display_type": "date", 
+			"trait_type": "birthday", 
+			"value": 1020556800
+		  }
+	]
+}
